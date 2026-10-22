@@ -1,0 +1,36 @@
+# Rust
+/rust-cekirdek/target/
+**/*.rs.bk
+Cargo.lock
+
+# Mimar çalışma dosyaları (üretilen beyinler/yedekler)
+*.wal
+*.snapshots/
+*.enc
+*.mqz
+*.cases.tsv
+*.yedek-*
+/denemeproje/*.mimar
+
+# Diller
+__pycache__/
+*.pyc
+node_modules/
+/ornekler/go/ornek
+/ornekler/go/ornek.exe
+
+# Editör / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# İç/özel dosyalar (yayınlanmaz)
+PLAN-v2-*.md
+TASARIM-*.md
+mimar-sunum.html
+demo-genel/
+mount-ornegi/
+
+# Üretilen beyin dosyaları (kaynak değil)
+*.mimar

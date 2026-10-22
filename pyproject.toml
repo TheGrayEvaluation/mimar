@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mimar"
+version = "0.1.0"
+description = "Mimar — yapay zekânın SQLite'ı: Python binding (saf-Python referans + C-ABI/ctypes üretim yolu)"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.8"
+keywords = ["ai", "embedded", "semantic-cache", "llm"]
+authors = [{ name = "Mimar katkıcıları" }]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.urls]
+Homepage = "https://github.com/TheGrayEvaluation/mimar"
+Repository = "https://github.com/TheGrayEvaluation/mimar"
+
+# Saf-Python referans paketi (mimar/). ÜRETİM: Rust cdylib'i (mimar_core.dll/.so)
+# ctypes ile çağırın — bkz. ENTEGRASYON.md. (maturin/pyo3 tekerleği yol haritasında.)
+[tool.setuptools]
+packages = ["mimar", "mimar.engines"]

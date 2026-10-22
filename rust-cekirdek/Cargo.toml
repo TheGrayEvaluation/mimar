@@ -1,0 +1,68 @@
+[package]
+name = "mimar_core"
+version = "0.1.0"
+edition = "2021"
+description = "Mimar — yapay zekânın SQLite'ı: her programa gömülen, modelden bağımsız, sıfır-bağımlılık AI çekirdeği (.mimar beyin formatı + planlayıcı + anlamsal eşleşme + HNSW + davranış damıtma)"
+license = "MIT"
+repository = "https://github.com/TheGrayEvaluation/mimar"
+homepage = "https://github.com/TheGrayEvaluation/mimar"
+documentation = "https://docs.rs/mimar_core"
+readme = "README.md"
+keywords = ["ai", "embedded", "semantic-cache", "llm", "no-std"]
+categories = ["database-implementations", "embedded", "api-bindings"]
+authors = ["Mimar katkıcıları"]
+rust-version = "1.70"
+
+# ÇEKİRDEK sıfır bağımlılık (SQLite gibi her yere gömülür). GUI AYRI bir program
+# olduğundan eframe yalnız `--features gui` ile, sadece mimar-gui binary'sine girer;
+# `cargo build` (çekirdek + mimar CLI) hiçbir dış crate çekmez.
+[dependencies]
+eframe = { version = "0.33", optional = true }
+rfd = { version = "0.14", optional = true }   # native dosya aç/kaydet diyaloğu
+ureq = { version = "2", optional = true }     # bulut API (HTTPS/TLS) — yalnız `cloud`
+# Sunucu-tarafı TLS (yalnız `tls`): rustls ring sağlayıcı (C araç zinciri gerektirmez)
+rustls = { version = "0.23", optional = true, default-features = false, features = ["ring", "std", "tls12"] }
+rustls-pemfile = { version = "2", optional = true }
+rcgen = { version = "0.13", optional = true, default-features = false, features = ["ring", "pem"] }
+
+[features]
+default = ["net"]
+# net: ağ/thread modülleri (engine/httpd/remote/mcp/distill). KAPATILINCA
+# (--no-default-features) geriye GÖMÜLEBİLİR çekirdek kalır: format+embed+eşleşme+
+# HNSW+ML+nicemleme (quant) — wasm/gömülü hedeflere derlenir, net bağımlılığı yok.
+net = []
+gui = ["net", "dep:eframe", "dep:rfd"]   # GUI uzak panel+engine kullanır → net
+cloud = ["net", "dep:ureq"]   # OpenRouter / OpenAI-uyumlu bulut (TLS); engine/net gerekir
+tls = ["net", "dep:rustls", "dep:rustls-pemfile", "dep:rcgen"]   # sunucu-tarafı HTTPS
+
+# Debian/Ubuntu paketi:  cargo deb   → .deb üretir (cargo-deb aracı ile)
+[package.metadata.deb]
+maintainer = "Mimar katkıcıları"
+license-file = ["../LICENSE", "0"]
+extended-description = "Mimar — yapay zekânın SQLite'ı: gömülü, modelden bağımsız AI çekirdeği."
+section = "utils"
+priority = "optional"
+assets = [
+  ["target/release/mimar", "usr/bin/", "755"],
+  ["../README.md", "usr/share/doc/mimar/README.md", "644"],
+]
+
+[lib]
+name = "mimar_core"
+path = "src/lib.rs"
+# rlib: iç binary'ler için · cdylib: C/Python/Node/Go FFI (her dile kütüphane)
+# · staticlib: C uygulamasına statik linkleme (gömülü)
+crate-type = ["rlib", "cdylib", "staticlib"]
+
+[[bin]]
+name = "mimar"
+path = "src/main.rs"
+
+[[bin]]
+name = "mimar-gui"
+path = "src/bin/gui.rs"
+required-features = ["gui"]
+
+[profile.release]
+opt-level = 3
+lto = true

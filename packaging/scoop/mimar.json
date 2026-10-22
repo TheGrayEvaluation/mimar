@@ -1,0 +1,21 @@
+{
+  "version": "0.1.0",
+  "description": "Mimar — yapay zekanin SQLite'i: gomulu, modelden bagimsiz AI cekirdegi",
+  "homepage": "https://github.com/TheGrayEvaluation/mimar",
+  "license": "MIT",
+  "architecture": {
+    "64bit": {
+      "url": "https://github.com/TheGrayEvaluation/mimar/releases/download/v0.1.0/mimar-windows-x64.zip",
+      "hash": "DOLDUR_ZIP_SHA256"
+    }
+  },
+  "bin": "mimar.exe",
+  "checkver": "github",
+  "autoupdate": {
+    "architecture": {
+      "64bit": {
+        "url": "https://github.com/TheGrayEvaluation/mimar/releases/download/v$version/mimar-windows-x64.zip"
+      }
+    }
+  }
+}

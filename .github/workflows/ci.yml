@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+
+jobs:
+  test:
+    name: test & build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        working-directory: rust-cekirdek
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test (varsayılan)
+        run: cargo test --lib
+      - name: Derleme — çekirdek + CLI
+        run: cargo build --release
+      - name: Derleme — GÖMÜLEBİLİR çekirdek (net yok)
+        run: cargo build --release --no-default-features --lib
+      - name: Derleme — cloud (istemci TLS)
+        run: cargo build --release --features cloud
+      - name: Derleme + test — tls (sunucu TLS)
+        run: cargo test --features tls --lib
+
+  wasm:
+    name: wasm32 gömülebilir çekirdek
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rust-cekirdek
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - name: wasm32 derleme (ağsız çekirdek)
+        run: cargo build --lib --no-default-features --target wasm32-unknown-unknown
+
+  release:
+    name: binary release (${{ matrix.os }})
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write        # GitHub Release oluşturmak için
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset: mimar-linux-x64.tar.gz
+          - os: macos-latest
+            asset: mimar-macos-x64.tar.gz
+          - os: windows-latest
+            asset: mimar-windows-x64.zip
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Release ikilisi (CLI + TLS)
+        working-directory: rust-cekirdek
+        run: cargo build --release --features tls
+      - name: Paketle
+        shell: bash
+        working-directory: rust-cekirdek/target/release
+        run: |
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            7z a "../../../${{ matrix.asset }}" mimar.exe
+          else
+            tar czf "../../../${{ matrix.asset }}" mimar
+          fi
+      - name: GitHub Release'e ekle
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.asset }}
+          generate_release_notes: true

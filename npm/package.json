@@ -1,0 +1,15 @@
+{
+  "name": "mimar",
+  "version": "0.1.0",
+  "description": "Mimar — yapay zekanin SQLite'i: Node binding (C-ABI/cdylib uzerinden ffi)",
+  "license": "MIT",
+  "keywords": ["ai", "embedded", "semantic-cache", "llm"],
+  "repository": { "type": "git", "url": "https://github.com/TheGrayEvaluation/mimar" },
+  "main": "index.js",
+  "files": ["index.js", "README.md"],
+  "engines": { "node": ">=16" },
+  "comment": "Uretim: Rust cdylib (mimar_core) ffi-napi/koffi ile cagrilir — mimar_open/resolve/teach/recall/teach_vec/resolve_vec. Native tekerlek paketleme yol haritasinda.",
+  "scripts": {
+    "build:core": "cd ../rust-cekirdek && cargo build --release"
+  }
+}
